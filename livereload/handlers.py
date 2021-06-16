@@ -43,8 +43,8 @@ class LiveReloadHandler(WebSocketHandler):
 
         try:
             self.write_message(message)
-        except:
-            logger.error('Error sending message', exc_info=True)
+        except Exception as ex:
+            logger.error(f'Error sending message{ex}', exc_info=True)
 
     @classmethod
     def start_tasks(cls):
@@ -58,7 +58,7 @@ class LiveReloadHandler(WebSocketHandler):
         cls._last_reload_time = time.time()
         logger.info('Start watching changes')
         if not cls.watcher.start(cls.poll_tasks):
-            logger.info('Start detecting changes')
+            logger.info('Start detecting changes: run python manage.py runserver and request a page')
             ioloop.PeriodicCallback(cls.poll_tasks, 800).start()
 
     @classmethod
@@ -106,8 +106,8 @@ class LiveReloadHandler(WebSocketHandler):
         for waiter in cls.waiters:
             try:
                 waiter.write_message(msg)
-            except:
-                logger.error('Error sending message', exc_info=True)
+            except Exception as ex:
+                logger.error(f'Error sending message:{ex}', exc_info=True)
                 cls.waiters.remove(waiter)
 
     def on_message(self, message):
